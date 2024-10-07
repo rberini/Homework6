@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "hodge_podge.html",
+    "href": "hodge_podge.html",
+    "title": "Hodge Podge",
+    "section": "",
+    "text": "What is the purpose of the lapply() function? What is the equivalent purrr function?\nSuppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use lapply() to run the code cor(numeric_matrix, method = “kendall”) on each element of the list. Write code to do this below! (I’m really trying to ask you how you specify method = “kendall” when calling lapply())\nWhat are two advantages of using purrr functions instead of the BaseR apply family?\nWhat is a side-effect function?\nWhy can you name a variable sd in a function and not cause any issues with the sd function?"
+  },
+  {
+    "objectID": "hodge_podge.html#task-1-conceptual-questions",
+    "href": "hodge_podge.html#task-1-conceptual-questions",
+    "title": "Hodge Podge",
+    "section": "",
+    "text": "What is the purpose of the lapply() function? What is the equivalent purrr function?\nSuppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use lapply() to run the code cor(numeric_matrix, method = “kendall”) on each element of the list. Write code to do this below! (I’m really trying to ask you how you specify method = “kendall” when calling lapply())\nWhat are two advantages of using purrr functions instead of the BaseR apply family?\nWhat is a side-effect function?\nWhy can you name a variable sd in a function and not cause any issues with the sd function?"
+  },
+  {
+    "objectID": "hodge_podge.html#task-2-writing-r-functions",
+    "href": "hodge_podge.html#task-2-writing-r-functions",
+    "title": "Hodge Podge",
+    "section": "Task 2: Writing R Functions",
+    "text": "Task 2: Writing R Functions"
+  },
+  {
+    "objectID": "hodge_podge.html#task-3-querying-an-api-and-a-tidy-style-function",
+    "href": "hodge_podge.html#task-3-querying-an-api-and-a-tidy-style-function",
+    "title": "Hodge Podge",
+    "section": "Task 3: Querying an API and a Tidy-Style Function",
+    "text": "Task 3: Querying an API and a Tidy-Style Function"
+  }
+]
