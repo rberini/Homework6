@@ -1,0 +1,20 @@
+---
+title: "Hodge Podge"
+author: "Robert Berini"
+format: html
+editor: visual
+---
+
+## Task 1: Conceptual Questions
+
+1. What is the purpose of the lapply() function? What is the equivalent purrr function?
+2. Suppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use lapply() to run the code cor(numeric_matrix, method = "kendall") on each element of the list. Write code to do this below! (I’m really trying to ask you how you specify method = "kendall" when calling lapply())
+3. What are two advantages of using purrr functions instead of the BaseR apply family?
+4. What is a side-effect function?
+5. Why can you name a variable sd in a function and not cause any issues with the sd function?
+
+## Task 2: Writing R Functions
+
+
+
+## Task 3: Querying an API and a Tidy-Style Function
