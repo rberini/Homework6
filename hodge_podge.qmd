@@ -32,8 +32,8 @@ Because the scope of the variable within the function is contained to the local 
 ## Task 2: Writing R Functions
 
 ### Root Mean Squared Error Function
-Write a basic function (call it `getRMSE()`) that takes in a vector of responses and a vector of predictions and outputs the Root Mean Squared Error. If a value is missing for the vector of responses (i.e. an NA is present), allow for additional arguments to the `mean()` function (elipses) that removes the NA values in the computation.
 
+Write a basic function (call it `getRMSE()`) that takes in a vector of responses and a vector of predictions and outputs the Root Mean Squared Error. If a value is missing for the vector of responses (i.e. an NA is present), allow for additional arguments to the `mean()` function (elipses) that removes the NA values in the computation.
 ```{r}
 getRMSE <- function(responses, predictions, ...) {
   mean <- mean(((responses - predictions)^2),...)
@@ -76,8 +76,8 @@ getRMSE(resp_nas, pred, na.rm = TRUE)
 Write a function called getMAE() that follows the specifications of the getRMSE() function.
 ```{r}
 getMAE <- function(responses, predictions, ...) {
-  mean <- mean((responses - predictions),...)
-  abs(mean)
+  mean <- mean(abs(responses - predictions),...)
+  mean
 }
 ```
 
@@ -111,6 +111,78 @@ getMAE(resp_nas, pred)
 getMAE(resp_nas, pred, na.rm = TRUE)
 ```
 
+Create a wrapper function that can be used to get either or both metrics returned with a single function call. Call the getRMSE() and getMAE() functions as helper functions within the wrapper. When returning values, give them appropriate names.
+```{r}
+pred_eval <- function(responses, predictions, metrics = "RMSE, MAE", ...) {
+  output <- list()
+  if (!is.numeric(responses) |
+      !is.atomic(responses) |
+      !is.numeric(predictions) |
+      !is.atomic(predictions)) {
+    stop("Error: Please choose a numeric atomic vector for both responses and predictions")
+  }
+  if (stringr::str_detect(toupper(metrics), "RMSE")) {
+    RMSE <- getRMSE(responses, predictions, ...)
+    output$RMSE <- RMSE
+  } 
+  if (stringr::str_detect(toupper(metrics), "MAE")) {
+    MAE <- getMAE(responses, predictions, ...)
+    output$MAE <- MAE
+  }
+  return(output)
+}
+```
+
+Run the following code to create some response values and predictions.
+```{r}
+set.seed(10)
+n <- 100
+x <- runif(n)
+resp <- 3 + 10 * x + rnorm(n)
+pred <- predict(lm(resp ~ x), data.frame(x))
+```
+
+Test the `pred_eval` function using the above data. Call it once asking for each metric individually and once specifying both metrics.
+```{r}
+pred_eval(resp, pred, "rmse")
+```
+```{r}
+pred_eval(resp, pred, "mae")
+```
+```{r}
+pred_eval(resp, pred, "RMSE, MAE")
+```
+
+Repeat after replacing two of the response values with missing values (NA_real_).
+```{r}
+resp_nas <- resp
+resp_nas[c(2, 52)] <- NA_real_
+```
+
+```{r}
+pred_eval(resp_nas, pred, "rmse", na.rm = T)
+```
+
+```{r}
+pred_eval(resp_nas, pred, "mae", na.rm = T)
+```
+
+```{r}
+pred_eval(resp_nas, pred, "RMSE, MAE", na.rm = T)
+```
+
+Finally, test the `pred_eval` function by passing it incorrect data (i.e., a data frame or something else instead of vectors).
+```{r}
+#| error: true
+
+pred_eval(iris, mtcars)
+```
+```{r}
+#| error: true
+
+pred_eval(letters, 1:26)
+```
+
 ## Task 3: Querying an API and a Tidy-Style Function
 
 Load required packages
@@ -119,23 +191,86 @@ library(conflicted)
 library(tidyverse)
 library(httr)
 library(jsonlite)
+
+conflicts_prefer(dplyr::lag)
+conflicts_prefer(dplyr::filter)
 ```
 
 
 API key: 214a818775454f13ab5ccf959e471a0f
 ```{r}
 subject <- "election"
-api_key <- "214a818775454f13ab5ccf959e471a0f"
 start_date <- today() - 30
+api_key <- "214a818775454f13ab5ccf959e471a0f"
 URL_base <- "https://newsapi.org/v2/everything?q="
 URL_id <- paste0(URL_base, subject, "&from=", start_date, "&sortBy=publishedAt&apiKey=", api_key)
 ```
 
-Use GET() from the httr package to return information about a topic that you are interested in that has been in the news lately (store the result as an R object).
+Use GET() from the httr package to return information about a topic that you are interested in that has been in the news lately (store the result as an R object). Parse what is returned and find your way to the data frame that has the actual article information in it (check content).
 ```{r}
 news_raw <- GET(URL_id)
-news_stories <- fromJSON(rawToChar(news_raw$content))
+news_stories <- fromJSON(rawToChar(news_raw$content), flatten = T, simplifyDataFrame = T)
 news_stories <- as_tibble(news_stories)
+news_stories
 ```
 
+Use the `pluck()` function from `purrr` to grab the articles element.
+```{r}
+#news_stories$articles$content
+articles <- pluck(news_stories, "articles")
+articles
+```
+
+Now write a quick function that allows the user to easily query this API. The inputs to the function should be the title/subject to search for (string), a time period to search from (string - you’ll search from that time until the present), and an API key.
+
+```{r}
+news_query <- function(subject, start_date = today() - 30, api_key) {
+  URL_base <- "https://newsapi.org/v2/everything?q="
+  URL_id <- paste0(URL_base, subject, "&from=", start_date, "&sortBy=publishedAt&apiKey=", api_key)
+  news_raw <- GET(URL_id)
+  news_stories <- fromJSON(rawToChar(news_raw$content), flatten = T, simplifyDataFrame = T)
+  news_stories <- as_tibble(news_stories)
+  articles <- pluck(news_stories, "articles")
+  return(articles)
+}
+```
+
+Use your function twice to grab some data (save each as an object)
+```{r}
+articles_football <- news_query("football", "2024-09-17", "214a818775454f13ab5ccf959e471a0f")
+articles_baseball <- news_query(subject = "baseball",
+                                api_key = "214a818775454f13ab5ccf959e471a0f")
+```
+
+With one of your objects, summarize the name of the source for each article. That is, find a one-way contingency table for this information
+```{r}
+articles_football |>
+  group_by(source.name) |>
+  summarise(count = n()) |>
+  arrange(desc(count))
+```
+
+For each of your returned data objects, turn the publishedAt column into a date column using the lubridate package (see the PARSE DATE-TIMES section of the cheat sheet!). Then sort the two data frames, each by their new parsed date published column. Finally, create a new variable called pub_diff that is the difference in time between the articles’ published dates (use lag() with mutate()). Save the modifications as new data frames.
+```{r}
+articles_football_sorted <-
+  articles_football |>
+    mutate(publishedAt = ymd_hms(publishedAt)) |>
+    arrange(desc(publishedAt)) |>
+    mutate(pub_diff = lag(publishedAt) - publishedAt)
+
+articles_baseball_sorted <-
+  articles_baseball |>
+    mutate(publishedAt = ymd_hms(publishedAt)) |>
+    arrange(desc(publishedAt)) |>
+    mutate(pub_diff = lag(publishedAt) - publishedAt)
+```
+
+Choose one of your data frames. Subset the data frame to only return the date version of publishedAt and the pub_diff variables. Then use one call to the map() function to return the mean, standard deviation, and median of these columns. You should use a custom anonymous function using ‘shorthand’ notation (\(x) ...). Note that the pub_diff variable includes an NA so you’ll need to set na.rm = TRUE in the calls to mean(0, sd(), and median().
+```{r}
+articles_baseball_sorted |>
+  select(publishedAt, pub_diff) |>
+  map(\(x) list(mean = mean(x, na.rm = T),
+                median = median(x, na.rm = T),
+                stddev = sd(x, na.rm = T)))
+```
 
