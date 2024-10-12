@@ -111,6 +111,8 @@ getMAE(resp_nas, pred)
 getMAE(resp_nas, pred, na.rm = TRUE)
 ```
 
+### Wrapper Function
+
 Create a wrapper function that can be used to get either or both metrics returned with a single function call. Call the getRMSE() and getMAE() functions as helper functions within the wrapper. When returning values, give them appropriate names.
 ```{r}
 pred_eval <- function(responses, predictions, metrics = "RMSE, MAE", ...) {
@@ -119,7 +121,7 @@ pred_eval <- function(responses, predictions, metrics = "RMSE, MAE", ...) {
       !is.atomic(responses) |
       !is.numeric(predictions) |
       !is.atomic(predictions)) {
-    stop("Error: Please choose a numeric atomic vector for both responses and predictions")
+    stop("Please choose a numeric atomic vector for both responses and predictions")
   }
   if (stringr::str_detect(toupper(metrics), "RMSE")) {
     RMSE <- getRMSE(responses, predictions, ...)
@@ -187,10 +189,10 @@ pred_eval(letters, 1:26)
 
 Load required packages
 ```{r}
-library(conflicted)
-library(tidyverse)
 library(httr)
 library(jsonlite)
+library(conflicted)
+library(tidyverse)
 
 conflicts_prefer(dplyr::lag)
 conflicts_prefer(dplyr::filter)
