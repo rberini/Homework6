@@ -8,13 +8,134 @@ editor: visual
 ## Task 1: Conceptual Questions
 
 1. What is the purpose of the lapply() function? What is the equivalent purrr function?
-2. Suppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use lapply() to run the code cor(numeric_matrix, method = "kendall") on each element of the list. Write code to do this below! (I’m really trying to ask you how you specify method = "kendall" when calling lapply())
+
+`lapply()` applies a function to each element of a named list. The equivalent `purrr` function is `map()`.
+
+2. Suppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use lapply() to run the code cor(numeric_matrix, method = "kendall") on each element of the list.
+
+`lapply(X = my_list, FUN = cor, y = numeric_matrix, method = "kendall")`
+*additional arguments (`y` and `method`) are added after the function call*
+
 3. What are two advantages of using purrr functions instead of the BaseR apply family?
+
+`purrr` offers greater consistency across the functions. In addition, it offers useful variants and helpful functions not available to the `apply` family. 
+
 4. What is a side-effect function?
+
+A side-effect function is ...
+
 5. Why can you name a variable sd in a function and not cause any issues with the sd function?
+
+Because the scope of the variable within the function is contained to the local environment.
+
 
 ## Task 2: Writing R Functions
 
+### Root Mean Squared Error Function
+Write a basic function (call it `getRMSE()`) that takes in a vector of responses and a vector of predictions and outputs the Root Mean Squared Error. If a value is missing for the vector of responses (i.e. an NA is present), allow for additional arguments to the `mean()` function (elipses) that removes the NA values in the computation.
 
+```{r}
+getRMSE <- function(responses, predictions, ...) {
+  mean <- mean(((responses - predictions)^2),...)
+  sqrt(mean)
+}
+```
+
+Run the following code to create some response values and predictions.
+```{r}
+set.seed(10)
+n <- 100
+x <- runif(n)
+resp <- 3 + 10 * x + rnorm(n)
+pred <- predict(lm(resp ~ x), data.frame(x))
+```
+
+Test your RMSE function using this data.
+```{r}
+getRMSE(resp, pred)
+```
+
+Repeat after replacing two of the response values with missing values (NA_real_).
+```{r}
+resp_nas <- resp
+resp_nas[c(2, 52)] <- NA_real_
+```
+
+Test your RMSE function with and without specifying the behavior to deal with missing values.
+```{r}
+#without
+getRMSE(resp_nas, pred)
+```
+```{r}
+#with
+getRMSE(resp_nas, pred, na.rm = TRUE)
+```
+
+### Mean Absolute Error Function
+
+Write a function called getMAE() that follows the specifications of the getRMSE() function.
+```{r}
+getMAE <- function(responses, predictions, ...) {
+  mean <- mean((responses - predictions),...)
+  abs(mean)
+}
+```
+
+Run the following code to create some response values and predictions.
+```{r}
+set.seed(10)
+n <- 100
+x <- runif(n)
+resp <- 3 + 10 * x + rnorm(n)
+pred <- predict(lm(resp ~ x), data.frame(x))
+```
+
+Test your MAE function using this data.
+```{r}
+getMAE(resp, pred)
+```
+
+Repeat after replacing two of the response values with missing values (NA_real_).
+```{r}
+resp_nas <- resp
+resp_nas[c(2, 52)] <- NA_real_
+```
+
+Test your MAE function with and without specifying the behavior to deal with missing values.
+```{r}
+#without
+getMAE(resp_nas, pred)
+```
+```{r}
+#with
+getMAE(resp_nas, pred, na.rm = TRUE)
+```
 
 ## Task 3: Querying an API and a Tidy-Style Function
+
+Load required packages
+```{r}
+library(conflicted)
+library(tidyverse)
+library(httr)
+library(jsonlite)
+```
+
+
+API key: 214a818775454f13ab5ccf959e471a0f
+```{r}
+subject <- "election"
+api_key <- "214a818775454f13ab5ccf959e471a0f"
+start_date <- today() - 30
+URL_base <- "https://newsapi.org/v2/everything?q="
+URL_id <- paste0(URL_base, subject, "&from=", start_date, "&sortBy=publishedAt&apiKey=", api_key)
+```
+
+Use GET() from the httr package to return information about a topic that you are interested in that has been in the news lately (store the result as an R object).
+```{r}
+news_raw <- GET(URL_id)
+news_stories <- fromJSON(rawToChar(news_raw$content))
+news_stories <- as_tibble(news_stories)
+```
+
+
