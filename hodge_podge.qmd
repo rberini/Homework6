@@ -7,33 +7,32 @@ editor: visual
 
 ## Task 1: Conceptual Questions
 
-1. What is the purpose of the lapply() function? What is the equivalent purrr function?
+1.  What is the purpose of the lapply() function? What is the equivalent purrr function?
 
 `lapply()` applies a function to each element of a named list. The equivalent `purrr` function is `map()`.
 
-2. Suppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use lapply() to run the code cor(numeric_matrix, method = "kendall") on each element of the list.
+2.  Suppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use lapply() to run the code cor(numeric_matrix, method = "kendall") on each element of the list.
 
-`lapply(X = my_list, FUN = cor, y = numeric_matrix, method = "kendall")`
+`lapply(X = my_list, FUN = cor, y = numeric_matrix, method = "kendall")`\
 *additional arguments (`y` and `method`) are added after the function call*
 
-3. What are two advantages of using purrr functions instead of the BaseR apply family?
+3.  What are two advantages of using purrr functions instead of the BaseR apply family?
 
-`purrr` offers greater consistency across the functions. In addition, it offers useful variants and helpful functions not available to the `apply` family. 
+`purrr` offers greater consistency across the functions. In addition, it offers useful variants and helpful functions not available to the `apply` family.
 
-4. What is a side-effect function?
+4.  What is a side-effect function?
 
-A side-effect function is ...
+A side-effect function returns something other than a transformation. For instance, it may print something to the console, plot a graphic, or save a file. To ensure such functions are pipeable, they should return a data frame invisibly.
 
-5. Why can you name a variable sd in a function and not cause any issues with the sd function?
+5.  Why can you name a variable sd in a function and not cause any issues with the sd function?
 
-Because the scope of the variable within the function is contained to the local environment.
-
+Because the scope of the variable within the function is contained to the local environment. It is a temporary variable within that environment.
 
 ## Task 2: Writing R Functions
 
 ### Root Mean Squared Error Function
 
-Write a basic function (call it `getRMSE()`) that takes in a vector of responses and a vector of predictions and outputs the Root Mean Squared Error. If a value is missing for the vector of responses (i.e. an NA is present), allow for additional arguments to the `mean()` function (elipses) that removes the NA values in the computation.
+Write a basic function (call it `getRMSE()`) that takes in a vector of responses and a vector of predictions and outputs the Root Mean Squared Error. If a value is missing for the vector of responses (i.e., an NA is present), allow for additional arguments to the `mean()` function that removes the NA values in the computation.
 ```{r}
 getRMSE <- function(responses, predictions, ...) {
   mean <- mean(((responses - predictions)^2),...)
@@ -50,22 +49,23 @@ resp <- 3 + 10 * x + rnorm(n)
 pred <- predict(lm(resp ~ x), data.frame(x))
 ```
 
-Test your RMSE function using this data.
+Test the `getRMSE()` function using this data.
 ```{r}
 getRMSE(resp, pred)
 ```
 
-Repeat after replacing two of the response values with missing values (NA_real_).
+Repeat after replacing two of the response values with missing values (`NA_real\_`).
 ```{r}
 resp_nas <- resp
 resp_nas[c(2, 52)] <- NA_real_
 ```
 
-Test your RMSE function with and without specifying the behavior to deal with missing values.
+Test `getRMSE()` function with and without specifying the behavior to deal with missing values.
 ```{r}
 #without
 getRMSE(resp_nas, pred)
 ```
+
 ```{r}
 #with
 getRMSE(resp_nas, pred, na.rm = TRUE)
@@ -73,7 +73,7 @@ getRMSE(resp_nas, pred, na.rm = TRUE)
 
 ### Mean Absolute Error Function
 
-Write a function called getMAE() that follows the specifications of the getRMSE() function.
+Write a function called `getMAE()` that follows the specifications of the `getRMSE()` function.
 ```{r}
 getMAE <- function(responses, predictions, ...) {
   mean <- mean(abs(responses - predictions),...)
@@ -90,22 +90,23 @@ resp <- 3 + 10 * x + rnorm(n)
 pred <- predict(lm(resp ~ x), data.frame(x))
 ```
 
-Test your MAE function using this data.
+Test the `getMAE()` function using this data.
 ```{r}
 getMAE(resp, pred)
 ```
 
-Repeat after replacing two of the response values with missing values (NA_real_).
+Repeat after replacing two of the response values with missing values (`NA_real\_`).
 ```{r}
 resp_nas <- resp
 resp_nas[c(2, 52)] <- NA_real_
 ```
 
-Test your MAE function with and without specifying the behavior to deal with missing values.
+Test the `getMAE()` function with and without specifying the behavior to deal with missing values.
 ```{r}
 #without
 getMAE(resp_nas, pred)
 ```
+
 ```{r}
 #with
 getMAE(resp_nas, pred, na.rm = TRUE)
@@ -113,7 +114,7 @@ getMAE(resp_nas, pred, na.rm = TRUE)
 
 ### Wrapper Function
 
-Create a wrapper function that can be used to get either or both metrics returned with a single function call. Call the getRMSE() and getMAE() functions as helper functions within the wrapper. When returning values, give them appropriate names.
+Create a wrapper function that can be used to get either or both metrics returned with a single function call. Call the `getRMSE()` and `getMAE()` functions as helper functions within the wrapper. The function should return both metrics by default and include names. The behavior should be able to be changed using a character string of metrics to find. The function should check that two numeric atomic vectors have been passed. If not, a message should print and the function should exit.
 ```{r}
 pred_eval <- function(responses, predictions, metrics = "RMSE, MAE", ...) {
   output <- list()
@@ -148,14 +149,16 @@ Test the `pred_eval` function using the above data. Call it once asking for each
 ```{r}
 pred_eval(resp, pred, "rmse")
 ```
+
 ```{r}
 pred_eval(resp, pred, "mae")
 ```
+
 ```{r}
 pred_eval(resp, pred, "RMSE, MAE")
 ```
 
-Repeat after replacing two of the response values with missing values (NA_real_).
+Repeat after replacing two of the response values with missing values (`NA_real\_`).
 ```{r}
 resp_nas <- resp
 resp_nas[c(2, 52)] <- NA_real_
@@ -179,6 +182,7 @@ Finally, test the `pred_eval` function by passing it incorrect data (i.e., a dat
 
 pred_eval(iris, mtcars)
 ```
+
 ```{r}
 #| error: true
 
@@ -198,8 +202,8 @@ conflicts_prefer(dplyr::lag)
 conflicts_prefer(dplyr::filter)
 ```
 
-
-API key: 214a818775454f13ab5ccf959e471a0f
+Connect to the news API here at [newsapi.org]. Register for a key at
+that web site. Setup the API URL call.
 ```{r}
 subject <- "election"
 start_date <- today() - 30
@@ -208,7 +212,7 @@ URL_base <- "https://newsapi.org/v2/everything?q="
 URL_id <- paste0(URL_base, subject, "&from=", start_date, "&sortBy=publishedAt&apiKey=", api_key)
 ```
 
-Use GET() from the httr package to return information about a topic that you are interested in that has been in the news lately (store the result as an R object). Parse what is returned and find your way to the data frame that has the actual article information in it (check content).
+Use `GET()` from the `httr` package to return information about a topic of interest that has been in the news lately and store the result as an `R` object. Parse what is returned and locate data frame that has the actual article information.
 ```{r}
 news_raw <- GET(URL_id)
 news_stories <- fromJSON(rawToChar(news_raw$content), flatten = T, simplifyDataFrame = T)
@@ -223,8 +227,7 @@ articles <- pluck(news_stories, "articles")
 articles
 ```
 
-Now write a quick function that allows the user to easily query this API. The inputs to the function should be the title/subject to search for (string), a time period to search from (string - you’ll search from that time until the present), and an API key.
-
+Write a function that allows the user to easily query this API. The inputs to the function should be the subject to search for as a string, a time period to search from as a string, and an API key. Use 30 days prior to the current day as the default start date.
 ```{r}
 news_query <- function(subject, start_date = today() - 30, api_key) {
   URL_base <- "https://newsapi.org/v2/everything?q="
@@ -237,14 +240,14 @@ news_query <- function(subject, start_date = today() - 30, api_key) {
 }
 ```
 
-Use your function twice to grab some data (save each as an object)
+Use your function twice to grab some data. Save each as an object.
 ```{r}
 articles_football <- news_query("football", "2024-09-17", "214a818775454f13ab5ccf959e471a0f")
 articles_baseball <- news_query(subject = "baseball",
                                 api_key = "214a818775454f13ab5ccf959e471a0f")
 ```
 
-With one of your objects, summarize the name of the source for each article. That is, find a one-way contingency table for this information
+With one of the above objects, summarize the name of the source for each article. That is, find a one-way contingency table for this information.
 ```{r}
 articles_football |>
   group_by(source.name) |>
@@ -252,7 +255,7 @@ articles_football |>
   arrange(desc(count))
 ```
 
-For each of your returned data objects, turn the publishedAt column into a date column using the lubridate package (see the PARSE DATE-TIMES section of the cheat sheet!). Then sort the two data frames, each by their new parsed date published column. Finally, create a new variable called pub_diff that is the difference in time between the articles’ published dates (use lag() with mutate()). Save the modifications as new data frames.
+For each of the returned data objects, turn the `publishedAt` column into a date column using the `lubridate` package. Then sort the two data frames, each by the parsed date published column. Finally, create a new variable called `pub_diff` that is the difference in time between the articles’ published dates using `lag()` with `mutate()`. Save the modifications as new data frames.
 ```{r}
 articles_football_sorted <-
   articles_football |>
@@ -267,7 +270,7 @@ articles_baseball_sorted <-
     mutate(pub_diff = lag(publishedAt) - publishedAt)
 ```
 
-Choose one of your data frames. Subset the data frame to only return the date version of publishedAt and the pub_diff variables. Then use one call to the map() function to return the mean, standard deviation, and median of these columns. You should use a custom anonymous function using ‘shorthand’ notation (\(x) ...). Note that the pub_diff variable includes an NA so you’ll need to set na.rm = TRUE in the calls to mean(0, sd(), and median().
+Choose one of the above data frames. Subset the data frame to only return the date version of `publishedAt` and the `pub_diff` variables. Then use one call to the `map()` function to return the mean, standard deviation, and median of these columns. Use a custom anonymous function using ‘shorthand’ notation. Set `na.rm = TRUE` in the calls to `mean()`, `sd()`, and `median()`.
 ```{r}
 articles_baseball_sorted |>
   select(publishedAt, pub_diff) |>
@@ -275,4 +278,3 @@ articles_baseball_sorted |>
                 median = median(x, na.rm = T),
                 stddev = sd(x, na.rm = T)))
 ```
-
