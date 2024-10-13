@@ -18,7 +18,7 @@ editor: visual
 
 3.  What are two advantages of using purrr functions instead of the BaseR apply family?
 
-`purrr` offers greater consistency across the functions. In addition, it offers useful variants and helpful functions not available to the `apply` family.
+`purrr` offers greater consistency across the functions. In addition, it offers useful variants and helper functions not available to the `apply` family.
 
 4.  What is a side-effect function?
 
@@ -202,8 +202,8 @@ conflicts_prefer(dplyr::lag)
 conflicts_prefer(dplyr::filter)
 ```
 
-Connect to the news API here at [newsapi.org]. Register for a key at
-that web site. Setup the API URL call.
+Connect to the news API here at <newsapi.org>. Register for a key at
+that web site. Setup the URL for the API call.
 ```{r}
 subject <- "election"
 start_date <- today() - 30
